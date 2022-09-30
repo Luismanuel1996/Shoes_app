@@ -25,7 +25,7 @@ app.use(morgan("dev"));
 /**
  * Directs incoming static asset requests to the public folder
  */
-app.use(express.static("public"));
+app.use(express.static(join(__dirname, "../client/build")));
 
 /**
  * Directs all routes starting with /api to the top level api express router
@@ -38,7 +38,7 @@ app.use("/api", apiRouter);
  */
 app.use((req, res, next) => {
   try {
-    res.sendFile(join(__dirname, "../../public/index.html"));
+    res.sendFile(join(__dirname, "../client/build/index.html"));
   } catch (error) {
     next(error);
   }
