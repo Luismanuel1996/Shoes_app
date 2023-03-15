@@ -13,7 +13,7 @@
     "node",
     "mysql"
   ],
-  "author": "Ben Bryant",
+  "author": "Luis Cazares",
   "license": "MIT",
   "dependencies": {
     "@babel/cli": "^7.17.10",

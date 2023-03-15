@@ -1,33 +1,31 @@
-import { useState, useEffect } from "react";
+import { BrowserRouter, NavLink, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/Home.page";
+import ShoesPage from "./pages/Shoes.page";
+import SingleShoePage from "./pages/SingleShoe.page";
+import AddShoe from "./pages/AddShoe.page";
 
-function App() {
-  let [testState, setTestState] = useState(null);
-
-  useEffect(() => {
-    fetch("http://localhost:8080/api/test")
-      .then((res) => res.text())
-      .then((msg) => setTestState(msg))
-      .catch((err) => {
-        console.error(err);
-        setTestState("Could not connect to test api endpoint :(");
-      });
-  }, [testState]);
-
+export default function App(props) {
   return (
-    <div className="App">
-      <header>
-        <h1>Basic Mern Starter Template</h1>
-        <hr />
-        {testState ? (
-          <p>
-            API Working {Boolean(testState).toString()}; Test State: {testState}
-          </p>
-        ) : (
-          <p>Loading...</p>
-        )}
-      </header>
-    </div>
+    <BrowserRouter>
+      <nav>
+        <ul className="Links">
+          <li>
+            <NavLink to="/">Home</NavLink>
+          </li>
+          <li>
+            <NavLink to="/shoes">Shoes</NavLink>
+          </li>
+          <li>
+            <NavLink to="/shoes/add-shoe">Add Shoe</NavLink>
+          </li>
+        </ul>
+      </nav>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/shoes" element={<ShoesPage />} />
+        <Route path="/shoes/:id" element={<SingleShoePage />} />
+        <Route path="/shoes/add-shoe" element={<AddShoe />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
