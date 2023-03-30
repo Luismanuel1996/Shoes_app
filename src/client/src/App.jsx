@@ -3,6 +3,7 @@ import HomePage from "./pages/Home.page";
 import ShoesPage from "./pages/Shoes.page";
 import SingleShoePage from "./pages/SingleShoe.page";
 import AddShoe from "./pages/AddShoe.page";
+import EditShoe from "./pages/EditShoe.page";
 
 export default function App(props) {
   return (
@@ -25,6 +26,8 @@ export default function App(props) {
         <Route path="/shoes" element={<ShoesPage />} />
         <Route path="/shoes/:id" element={<SingleShoePage />} />
         <Route path="/shoes/add-shoe" element={<AddShoe />} />
+        <Route path="/shoes/:id/edit" element={<EditShoe history={props.history} />} />
+
       </Routes>
     </BrowserRouter>
   );

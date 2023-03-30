@@ -16,11 +16,8 @@ export default function ShoesPage() {
 
       if (res.ok) {
         const data = await res.json();
-        console.log("Data received:", data);
 
-        // Check if data is an object, and wrap it in an array
         const dataArray = Array.isArray(data) ? data : [data];
-        console.log("Data array:", dataArray);
 
         setShoesList(
           dataArray.map((shoe) => ({
@@ -36,18 +33,34 @@ export default function ShoesPage() {
     }
   }
 
-  useEffect(() => {
-    console.log("shoesList updated:", shoesList); // Log the updated shoesList
-  }, [shoesList]);
-
-  async function deleteShoe(id) {
-    // ...
-  }
-
-  const brands = getListOf(shoesList, "brand");
+  const brands = getListOf(shoesList, "Brand");
   const filteredShoes = filterShoesByBrand(shoesList, searchBrand);
 
-  console.log("filteredShoes:", filteredShoes); // Log the filtered shoes
+  async function deleteShoe(id) {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this shoe?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/shoes/${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        // Remove the shoe from the list of shoes
+        const newShoesList = shoesList.filter((shoe) => shoe.shoeId !== id);
+        setShoesList(newShoesList);
+      } else {
+        throw new Error("Failed to delete the shoe");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   return (
     <div>
@@ -71,9 +84,12 @@ export default function ShoesPage() {
       <ul className="List">
         {filteredShoes.map((shoe, index) => (
           <li key={index}>
-            <Link to={`${shoe.color}`}>{`${shoe.brand}   ${shoe.color}`}</Link>
-            <img src={`/${shoe.image}`} alt={`${shoe.brand} ${shoe.color}`} />
-            <button onClick={() => deleteShoe(shoe.shoeId)}>Delete</button>
+            <Link to={`/shoes/${shoe.shoeId}`}>
+              {`${shoe.Brand}   ${shoe.Color}`}
+            </Link>
+            <button onDoubleClick={() => deleteShoe(shoe.shoeId)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>

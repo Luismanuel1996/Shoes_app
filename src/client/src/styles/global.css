@@ -1,6 +1,6 @@
 * {
    font-size: 20px;
-  color: #f1356d;
+  color: black;
   margin-bottom: 30px;
 }
 
@@ -49,7 +49,7 @@ body {
 }
 .create h1 {
   font-size: 20px;
-  color: #f1356d;
+  color: black;
   margin-bottom: 30px;
 }
 .create input, .create select {
@@ -61,7 +61,7 @@ body {
   display: block;
 }
 .create button {
-  background: #f1356d;
+  background: black;
   color: #fff;
   border: 0;
   padding: 8px;
@@ -74,4 +74,13 @@ body {
   list-style: none;
   text-decoration: none;
   cursor: pointer;
+}
+.Links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 10px;
+  list-style: none;
+  text-decoration: none;
 }

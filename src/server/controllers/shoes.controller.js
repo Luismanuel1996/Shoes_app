@@ -1,49 +1,40 @@
-import query from "../db/utils";
+import express from "express";
+import config from "./config/index.js";
+import morgan from "morgan";
+import path from "path";
+import cors from "cors";
+import apiRouter from "./routes";
+import multer from "multer"; // Add multer import
 
-export async function findAll() {
-  try {
-    const [rows, fields] = await query('SELECT * FROM shoes');
-    console.log('Raw rows from findAll():', rows); // Add this line to log the raw results
-    console.log('Raw fields from findAll():', fields); // Add this line to log the raw fields
-    return rows;
-  } catch (error) {
-    throw error;
-  }
-}
+const app = express();
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/uploads/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+  },
+});
 
+const upload = multer({ storage });
 
-export async function findOne(shoeId) {
-  const [rows] = await query('SELECT * FROM shoes WHERE shoeId = ?', [shoeId]);
-  return rows[0];
-}
+app.use(express.json());
+app.use(cors());
 
-export async function findColor(color) {
-  const [rows] = await query('SELECT * FROM shoes WHERE color = ?', [color]);
-  return rows;
-}
+app.use(morgan("common"));
 
-export async function addOne(newShoe) {
-  const { brand, style, size, color, description, image } = newShoe;
+app.use("/api", upload.single("Image"), apiRouter);
 
-  const [result] = await query(
-    'INSERT INTO shoes (brand, style, size, color, description, image) VALUES (?, ?, ?, ?, ?, ?)',
-    [brand, style, size, color, description, image],
-  );
+app.use(express.static(path.join(__dirname, "./public")));
 
-  return result.insertId;
-}
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.header("Content-Type", "application/json");
+  res.send(JSON.stringify({ name: err.name, msg: err.message }));
+});
 
-export async function updateOne(updatedShoe, shoeId) {
-  const { brand, style, size, color, description, image } = updatedShoe;
-  const [result] = await query(
-    'UPDATE shoes SET brand=?, style=?, size=?, color=?, description=?, image=? WHERE shoeId = ?',
-    [brand, style, size, color, description, image, shoeId],
-  );
-  return result.affectedRows;
-}
-
-export async function remove(shoeId) {
-  const [result] = await query('DELETE FROM shoes WHERE shoeId = ?', [shoeId]);
-  return result.affectedRows;
-}
+app.listen(config.port, () => {
+  console.log(`Server listening on port ${config.port}...`);
+});

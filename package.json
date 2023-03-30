@@ -18,10 +18,31 @@
     "node",
     "react"
   ],
-  "author": "Ben Bryant",
+  "author": "Luis Cazares",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Bryantellius/basic-mern-template/issues"
   },
-  "homepage": "https://github.com/Bryantellius/basic-mern-template#readme"
+  "homepage": "https://github.com/Bryantellius/basic-mern-template#readme",
+  "dependencies": {
+    "react-router-dom": "^6.9.0"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.16.8",
+    "@babel/preset-react": "^7.16.7",
+    "babel-loader": "^8.2.3",
+    "css-loader": "^6.5.1",
+    "html-webpack-plugin": "^5.5.0",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0"
+  }
 }
