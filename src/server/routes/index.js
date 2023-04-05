@@ -1,5 +1,5 @@
 import express from "express";
-import shoeRouter from "./shoes.routes";
+import shoeRouter from "./shoes.routes.js";
 
 const router = express.Router();
 

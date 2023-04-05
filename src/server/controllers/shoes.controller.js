@@ -1,40 +1,116 @@
 import express from "express";
-import config from "./config/index.js";
-import morgan from "morgan";
-import path from "path";
-import cors from "cors";
-import apiRouter from "./routes";
-import multer from "multer"; // Add multer import
+import { findAll, addOne, findOne, remove, updateOne, updateShoeImage } from "../controllers/shoes.controller";
+import multer from "multer";
 
-const app = express();
+const router = express.Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/uploads/");
+    cb(null, "./public/uploads/");
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+    const fileName = Date.now() + "-" + file.originalname.toLowerCase().split(" ").join("-");
+    cb(null, fileName);
   },
 });
 
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+    return cb(new Error("Only .png, .jpg and .jpeg format allowed!"));
+  }
+};
 
-app.use(express.json());
-app.use(cors());
-
-app.use(morgan("common"));
-
-app.use("/api", upload.single("Image"), apiRouter);
-
-app.use(express.static(path.join(__dirname, "./public")));
-
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.header("Content-Type", "application/json");
-  res.send(JSON.stringify({ name: err.name, msg: err.message }));
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
 });
 
-app.listen(config.port, () => {
-  console.log(`Server listening on port ${config.port}...`);
+router.get("/", async (req, res, next) => {
+  try {
+    const data = await findAll();
+    res.header("Content-Type", "application/json");
+    res.send(JSON.stringify(data));
+    res.statusCode = 400;
+  } catch (err) {
+    next(err);
+  }
 });
+
+router.post("/", upload.single("Image"), async (req, res, next) => {
+  try {
+    const newShoe = {
+      Brand: req.body.Brand,
+      Style: req.body.Style,
+      Size: req.body.Size,
+      Color: req.body.Color,
+      Description: req.body.Description,
+      Image: req.file ? `/uploads/${req.file.filename}` : null,
+    };
+    const data = await addOne(newShoe);
+    res.header("Content-Type", "application/json");
+    res.send(JSON.stringify(data));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const data = await findOne(parseInt(id));
+    res.header("Content-Type", "application/json");
+    res.send(JSON.stringify(data));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const udpatedShoe = req.body;
+    const data = await updateOne(udpatedShoe, id);
+    res.header("Content-Type", "application/json");
+    res.send(JSON.stringify(data));
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put("/:id/image", upload.single("Image"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const image = req.file ? `/uploads/${req.file.filename}` : null;
+
+    if (!image) {
+      throw new Error("No image provided");
+    }
+
+    await updateShoeImage(image, id);
+    res.status(200).json({ message: "Image updated successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const shoe = await remove(id);
+    if (!shoe) {
+      return res.status(404).send("Shoe not found");
+    }
+    res.header("Content-Type", "application/json");
+    res.send(JSON.stringify({ message: "Shoe deleted successfully" }));
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+export default router;

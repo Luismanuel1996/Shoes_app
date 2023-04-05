@@ -1,10 +1,10 @@
 import express from "express";
-import config from "./config/index.js";
+import config from "config";
 import morgan from "morgan";
 import path from "path";
 import cors from "cors";
 import apiRouter from "./routes";
-import multer from "multer"; // Add multer import
+import multer from "multer";
 
 const app = express();
 
@@ -27,7 +27,6 @@ app.use(morgan("common"));
 
 app.use("/api", upload.single("Image"), apiRouter);
 
-// Solution 2: Serve uploaded images from the uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "./public/uploads")));
 
 app.use(express.static(path.join(__dirname, "./public")));
@@ -38,6 +37,10 @@ app.use((err, req, res, next) => {
   res.send(JSON.stringify({ name: err.name, msg: err.message }));
 });
 
-app.listen(config.port, () => {
-  console.log(`Server listening on port ${config.port}...`);
+const PORT = process.env.PORT || config.get("port") || 8080;
+
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}...`);
 });
+
+export default app;

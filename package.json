@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/Bryantellius/basic-mern-template#readme",
   "dependencies": {
+    "config": "^3.3.9",
     "react-router-dom": "^6.9.0"
   },
   "babel": {

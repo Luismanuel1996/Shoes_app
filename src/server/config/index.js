@@ -1,4 +1,3 @@
-
 import dotenv from "dotenv";
 
 // ensures that env variables are loaded
